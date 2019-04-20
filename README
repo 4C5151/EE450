@@ -1,0 +1,125 @@
+ ***********************************************************************************************
+                         EE450 Socket Project README
+
+
+                            Name:    Quanquan Lu
+                            Session: 3
+			    USCID:   6217812160
+************************************************************************************************
+
+What I Have Done:
+
+	In this socket project, I have successfully implemented all the requirements
+	with one client file, one AWS server file, and three individual server files.
+
+        The client will send the data to AWS by using TCP, and AWS will send the data from client 		to Server A, B, C for computation through UDP. And then, Server A, B, C will send the 		calculated value back to AWS through UDP again. At last, according the result from Server 		A, B and C, AWS compute the final result, and send it back to client by using TCP again.
+	
+***************************************************************************************************
+
+What Are My Codes:
+	
+	client.c:	Get the function and the value you want to calculate, sending them to 
+                        the AWS via TCP connection. And receive the final result from AWS by TCP.
+				
+	aws.c :		Receive the function type and data via TCP, then 
+                        and send them to server A, server B, server
+		        C separately by UDP connection. And next, receiving
+			each result from corresponding server via UDP and then, send the final
+			results to client using TCP after AWS finish its final computation.
+				
+	serverA.c	Using UDP get the value X from AWS, and then calculate the value of X to 				the power of 2, and then send it back to AWS. And later, serverA also 				help to calculate the result of X to the power of 4, and send it back 				again.
+				
+	serverB.c	Using UDP the get the X from AWS, and calculate the result of X to the 				power of 3 and 5. And send them back to AWS.
+			
+				
+	serverC.c	Using UDP to get the X from AWS. And Server C have to calcualte the value 				of X to power 6. And it also should be sent back to AWS.
+				
+**************************************************************************************************
+
+How TA Runs:
+
+		Open 5 command window, and make all firstly. Then for the 2nd 3rd 4th and 5th
+		window, input command "make serverA" "make serverB" "make serverC" "make aws"
+		separately. And finally input "./client <functions>" in the 1st window.
+		
+			command									actions
+			make all			Compiles client.c aws.c serverA.c 								serverB.c serverC.c
+							to create client aws serverA,B,C
+
+			make serverA    	        Runs server A (./serverA)
+			make serverB    	        Runs server B (./serverB)
+			make serverC    	        Runs server C (./serverC)
+			make aws    		        Runs aws      (./aws)
+			./client <function> <value>	Starts client
+
+		sample input: ./client LOG 0.5                 
+               (!!  'log' and 'div' doesn't work here)
+
+Be noticed that when you get the result from AWS, AWS will close, so if you want to continue testing. You have input "make aws" again, and then you can continue to test. But server A, B, C are still running.
+*************************************************************************************************
+
+Port Number I used:
+               
+ 		A_PORT 21160
+ 		B_PORT 22160
+ 		C_PORT 23160
+		AWS_UDP_PORT 24160
+		AWS_TCP_PORT 25160
+
+*************************************************************************************************
+All the variable included in the project:
+
+		1. Client:
+		
+		agrv[1] argv[2]  : char[], argv[1] is the function, argv[2] is the value.
+		Buffer           : Size 256, buffer in my code is just for receiving the result    
+				   from AWS, and print it out on the terminal.
+		
+		2. AWS:
+		result           : floating number, store the final result after computing.
+		p1,p2,p3,p4,p5,p6: floating number, here they are presenting x,x2,x3,x4,x5,x6
+		v4[10]           : char, here I want to send the x2 to serverA to work out x4. But 					   p2 is a floating number, so v4 here is to store the value of p2 					   in char type. (sprintf(v4,"%g",p2);)
+		v6[10]		 : char, same as v4, here I want to send p2 to serverB to get x6.
+                reserve[10]      : char, transfer the value of 'result' into char, and store it.
+                buffer[256]      : char, here is just for receiving the data from client.
+		buffer_udp[20]   : char, buffer for UDP, here is to receive the result from Server 
+                                   A, B and C.
+                funct[3]         : char, store the function type from client.
+                value[10]        : char, store the value from client.
+		
+
+		3. Server A, server B and server C:
+		value[10]        : char, get the value from AWS. 
+		bar              : floating number, transfer the value in "value" to floating 				           number, and store it. And later, bar will be replaced by the 		                   result of the computation. And then it will give its value to 					   "value", in order to send it back to AWS.
+				     (sprintf(value,"%g",bar);)
+		
+		
+********************************************************************************
+
+Idiosyncrasy:
+
+          When you input the other functions(not LOG/DIV), or the value not between 0 and 1, the 	client would exit and you will get some error messages, and then you have to re-run it 	     again. In that case, make sure you input the correct function name, and the value should   
+       between 0 and 1. And be noticed that the function name should be all capitals.(div/log doesn't  work here).
+          No idiosyncrasies detected for the program itself, which is that it may
+       be affected by the UNIX OS conditions but the problem is not at the
+       program. All possible error may occurred due to the OS's conditions are
+       caught and are properly handled.
+		
+************************************************************************************************
+
+Code Reusing:
+        a. Socket Programming via TCP and UDP is modified and reused from a sockets tutorial 		   webside, and you can see the part I used and modified in my code:
+          http://www.linuxhowtos.org/C_C++/socket.htm     
+          http://www.linuxhowtos.org/data/6/server.c     (The part that how to establish a TCP)
+          http://www.linuxhowtos.org/data/6/client.c     (The part that how to establish a TCP)
+	  http://www.linuxhowtos.org/data/6/server_udp.c (The basic step that how to establish a UDP)
+	  http://www.linuxhowtos.org/data/6/client_udp.c (The basic step that how to establish a UDP)
+
+        b. All other code, like computing by using the formula, handling the order of sending and 		   receiving, and making sure the messages on the screen are correct, are written and
+           implemented by myself. I used the provided knowledge base materials
+           as for reference purpose only.
+		   
+************************************************************************************************
+
+<EOF>
+
